@@ -4,7 +4,7 @@
 % Yagiz Aksoy, Tae-Hyun Oh, Sylvain Paris, Marc Pollefeys, Wojciech Matusik
 % "Semantic Soft Segmentation", ACM TOG (Proc. SIGGRAPH) 2018
 
-function [softSegments, initSoftSegments, Laplacian, affinities, features, superpixels, eigenvectors, eigenvalues] = SemanticSoftSegmentation(image, features)
+function [softSegments, initSoftSegments, Laplacian, affinities, features, superpixels, eigenvectors, eigenvalues] = SemanticSoftSegmentation(image, features, params)
     
     disp('Semantic Soft Segmentation')
     % Prepare the inputs and superpixels
@@ -20,7 +20,8 @@ function [softSegments, initSoftSegments, Laplacian, affinities, features, super
     disp('     Computing affinities')
     % Compute the affinities and the Laplacian
     affinities{1} = mattingAffinity(image);
-    affinities{2} = superpixels.neighborAffinities(features); % semantic affinity
+    erfCenter = params.paramValue;
+    affinities{2} = superpixels.neighborAffinities(features, [], erfCenter); % semantic affinity
     affinities{3} = superpixels.nearbyAffinities(image); % non-local color affinity
     Laplacian = affinityMatrixToLaplacian(affinities{1} + 0.01 * affinities{2} + 0.01 * affinities{3}); % Equation 6
 
@@ -39,7 +40,8 @@ function [softSegments, initSoftSegments, Laplacian, affinities, features, super
                                             h, w, features, initialSegmCnt, iterCnt, sparsityParam, [], []);
 
     % Group segments w.r.t. their mean semantic feature vectors
-    groupedSegments = groupSegments(initSoftSegments, features);
+    fg = params.fgXY;
+    groupedSegments = groupSegments(initSoftSegments, features, [], fg);
 
     disp('     Final optimization')
     % Do the final sparsification
