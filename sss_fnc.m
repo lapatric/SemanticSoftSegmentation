@@ -1,4 +1,4 @@
-function sss_fnc(folderName)
+                                                                                function sss_fnc(folderName)
 
     addpath('../SemanticMatting/rgParameterTuning');
     addpath('../ImageGraphs');
