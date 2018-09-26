@@ -1,20 +1,19 @@
 % This function is used to precompute the soft segments and distinguish the
 % initially activated foreground segments. The results are then saved.
-function generateFGAlphas(folderName)
+function generateFGAparams(folderName)
     addpath('../SemanticMatting/rgParameterTuning');
     addpath('../ImageGraphs');
 
     Fldr = dir(['../Images/', folderName,'/*.png']);
     N = size(Fldr,1);
-
-    for i=3:N
-        tic;
+    
+    for i=153:N
         try
             imName = Fldr(i).name;
             imName = imName(1:end-4);
 
             %% Set up image and its corresponding recorded parameters
-            params = load(['../SemanticMatting/rgParameterTuning/' folderName '_results/' imName '.mat']);
+            params = load(['../Files/sss_params/' folderName '/' imName '.mat']);
             image = im2double(imread(['../Images/' folderName '/' imName '.png']));
             features = image(:, size(image, 2) / 2 + 1 : end, :);
             image = image(:, 1 : size(image, 2) / 2, :);
@@ -89,7 +88,7 @@ function generateFGAlphas(folderName)
 
             %% NOTE: The combination of initSoftSegments and activeSegments then
              % yields the alphas of the foreground. We save these
-            folder = [folderName '_FGA/'];
+            folder = ['../Files/fga_params/' folderName '/'];
             save([folder imName '.mat'], 'initSoftSegments', 'activeSegments');
 
 %             fg_matte = zeros(h,w);
@@ -103,6 +102,5 @@ function generateFGAlphas(folderName)
         catch
             disp(['Failed to process ' imName '.png!']);
         end
-        toc;
     end
 end
